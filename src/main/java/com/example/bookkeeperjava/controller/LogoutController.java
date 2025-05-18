@@ -7,7 +7,6 @@ import org.springframework.security.web.authentication.logout.SecurityContextLog
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -16,9 +15,12 @@ import jakarta.servlet.http.HttpServletResponse;
 public class LogoutController {
 
     @PostMapping
+    //HttpServletRequestはHTTPリクエスト情報を受け取るクラス
     public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
         try {
             if (authentication != null) {
+                //SecurityContextLogoutHandlerはSpringSecurityのログアウト処理を行うクラス
+                //無効にしたいものをlogout()の引数に入れる
                 new SecurityContextLogoutHandler().logout(request, response, authentication);
             }
             return ResponseEntity.ok("ログアウト成功");

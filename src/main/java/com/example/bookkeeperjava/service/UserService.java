@@ -1,12 +1,10 @@
 package com.example.bookkeeperjava.service;
 
 import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import com.example.bookkeeperjava.dto.SignupRequest;
+import com.example.bookkeeperjava.dto.AuthRequest;
 import com.example.bookkeeperjava.model.User;
 import com.example.bookkeeperjava.repository.UserRepository;
 
@@ -43,7 +41,7 @@ public class UserService {
     }
 
     // ユーザー情報を保存
-    public void saveUser(SignupRequest request) {
+    public void saveUser(AuthRequest request) {
         User user = new User();
         user.setUserName(request.getUsername());
         user.setPassword(new BCryptPasswordEncoder().encode(request.getPassword()));

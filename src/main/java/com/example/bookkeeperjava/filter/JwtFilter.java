@@ -19,6 +19,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 @Component
+//OncePerRequestFilterはSpringSecurityが提供するフィルター基底クラス
 public class JwtFilter extends OncePerRequestFilter {
 
     @Autowired
@@ -30,31 +31,33 @@ public class JwtFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
-
+        //Authorizationヘッダーを取得する
         final String authorizationHeader = request.getHeader("Authorization");
 
         String username = null;
         String jwt = null;
 
+        //Bearer認証(トークンを利用した認証方式)であることを確認する
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            //"Bearer"以降を取り出す
             jwt = authorizationHeader.substring(7);
             username = jwtUtil.extractUsername(jwt);
         }
-
+        //セキュリティコンテキストからん敏捷情報を取り出して存在しないことを確認する
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
 
+            //JWTトークンが有効か確認する
             if (jwtUtil.validateToken(jwt, userDetails)) {
                 UsernamePasswordAuthenticationToken authentication =
                     new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             } else {
-                response.sendRedirect("/login");  // 無効なトークンの場合、ログインページにリダイレクト
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 return;
             }
         }
-
         chain.doFilter(request, response);
     }
 }
